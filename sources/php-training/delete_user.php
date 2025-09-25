@@ -1,13 +1,15 @@
 <?php
+session_start();
 require_once 'models/UserModel.php';
-$userModel = new UserModel();
 
-$user = NULL; //Add new user
-$id = NULL;
-
-if (!empty($_GET['id'])) {
-    $id = $_GET['id'];
-    $userModel->deleteUserById($id);//Delete existing user
+if (!isset($_GET['csrf_token']) || $_GET['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("Lỗi CSRF!!!");
 }
-header('location: list_users.php');
-?>
+
+if (isset($_GET['id'])) {
+    $userModel = new UserModel();
+    $id = intval($_GET['id']);
+    $userModel->deleteUserById($id);
+    header("Location: list_users.php");
+    exit;
+}
