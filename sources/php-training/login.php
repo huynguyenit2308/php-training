@@ -22,17 +22,17 @@ if (!empty($_POST['submit'])) {
     $user = $userModel->auth($username, $password);
 
     if ($user) {
-        $_SESSION['id'] = $user[0]['id'];
+        $_SESSION['id'] = $user['id'];
         $_SESSION['username'] = $username;
         $_SESSION['message'] = 'Login successful';
 
         if (!empty($_POST['remember'])) {
-            setcookie("remember_user", $user[0]['id'], time() + (30 * 24 * 60 * 60), "/", "", false, true);
+            setcookie("remember_user", $user['id'], time() + (30 * 24 * 60 * 60), "/", "", false, true);
         } else {
             setcookie("remember_user", "", time() - 3600, "/");
         }
 
-        setcookie("session_id", $user[0]['id'], time() + 3600, "/", "", false, true);
+        setcookie("session_id", $user['id'], time() + 3600, "/", "", false, true);
 
         header("Location: list_users.php");
         exit;

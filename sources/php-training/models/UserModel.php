@@ -30,9 +30,18 @@ class UserModel extends BaseModel
     public function auth($userName, $password)
     {
         $md5Password = md5($password);
-        $sql = 'SELECT * FROM users WHERE name = "' . $userName . '" AND password = "' . $md5Password . '"';
 
-        $user = $this->select($sql);
+        $stmt = self::$_connection->prepare('SELECT * FROM users WHERE name = ? AND password = ?');
+        if (!$stmt) {
+            die("Prepare failed: " . self::$_connection->error);
+        }
+
+        $stmt->bind_param('ss', $userName, $md5Password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        $stmt->close();
         return $user;
     }
 
