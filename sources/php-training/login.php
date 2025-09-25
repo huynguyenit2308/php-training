@@ -6,7 +6,16 @@ $userModel = new UserModel();
 $redis = new Redis();
 $redis->connect('web-redis', 6379);
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (!empty($_POST['submit'])) {
+    
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Lỗi CSRF!!!");
+    }
+
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
@@ -53,6 +62,7 @@ if (!empty($_POST['submit'])) {
 
                 <div style="padding-top:30px" class="panel-body">
                     <form method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
                         <div class="margin-bottom-25 input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
@@ -61,7 +71,7 @@ if (!empty($_POST['submit'])) {
 
                         <div class="margin-bottom-25 input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                            <input id="login-password" type="password" class="form-control" name="password" placeholder="password">
+                            <input id="login-password" type="password" class="form-control" name="password" value="" placeholder="password">
                         </div>
 
                         <div class="margin-bottom-25">
